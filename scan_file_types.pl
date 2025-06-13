@@ -23,7 +23,7 @@ my $DB_Name="";
 my $DB_Prefix="";
 my $DB_Table="";
 my $dbh;
-my $CONF_FILE="config.ini";
+my $CONF_FILE="$ENV{HOME}/.scanjdsettings.ini";
 my $CurNotify="";
 my $CurName="";
 my $email="";
