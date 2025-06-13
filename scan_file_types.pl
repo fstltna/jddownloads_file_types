@@ -10,9 +10,9 @@ use DBI;
 
 # No changes below here
 my $CurTitle="";
-my $CurAlias=0;
-my $CurFilePic=0;
-my $CurFileName=0;
+my $CurAlias="";
+my $CurFilePic="";
+my $CurFileName="";
 my $CurId=0;
 my $CurStatus="";
 my $timeout=5;
@@ -24,15 +24,37 @@ my $DB_Prefix="";
 my $DB_Table="";
 my $dbh;
 my $CONF_FILE="config.ini";
-my $EMAIL_SUBJ="";
-my $EMAIL_FROM="";
 my $CurNotify="";
 my $CurName="";
 my $email="";
 my $IconDir="/var/www/html/images/jdownloads/fileimages/flat_1/";
 my $UnknownType = "unknown";
+my $FILEEDITOR = $ENV{EDITOR};
+
+if ($FILEEDITOR eq "")
+{
+        $FILEEDITOR = "nano";
+}
+
+# Get if they said a option
+my $CMDOPTION = shift;
 
 # Read in configuration options
+if (! -f $CONF_FILE)
+{
+	my $DefaultConf = <<'END_MESSAGE';
+DB_User root
+DB_Pswd foobar
+DB_DBName       joomla
+DB_DBtblpfx     zzz_
+END_MESSAGE
+	open (my $FH, ">", $CONF_FILE) or die "Could not create config file '$CONF_FILE' $!";
+        print $FH "$DefaultConf\n";
+	close($FH);
+	system("$FILEEDITOR $CONF_FILE");
+	exit 0;
+}
+
 open(CONF, "<$CONF_FILE") || die("Unable to read config file '$CONF_FILE'");
 while(<CONF>)
 {
@@ -55,67 +77,8 @@ while(<CONF>)
 	{
 		$DB_Prefix = $FIELD_VALUE;
 	}
-	elsif ($FIELD_TYPE eq "Email_Subj")
-	{
-		$EMAIL_SUBJ = $FIELD_VALUE;
-	}
-	elsif ($FIELD_TYPE eq "Email_From")
-	{
-		$EMAIL_FROM = $FIELD_VALUE;
-	}
 }
 close(CONF);
-
-if ($EMAIL_SUBJ eq "")
-{
-	print "You have not set a email subject in $CONF_FILE\n";
-	exit 1;
-}
-if ($EMAIL_FROM eq "")
-{
-	print "You have not set a email sender in $CONF_FILE\n";
-	exit 1;
-}
-
-# Marks the Argentum Age state and check time
-sub MarkArgentum
-{
-	my($day, $month, $year)=(localtime)[3,4,5];
-	$year += 1900;
-	$month += 1;
-	$month = substr("0".$month, -2);
-	$day = substr("0".$day, -2);
-	my $timeString="$year-$month-$day";
-	# Field3 = date in "0000-00-00"
-	# Field4 = status in "Active/Unreachable" format
-	$dbh->do("UPDATE $DB_Table SET Field3 = ?, Field4 = ? WHERE id = ?",
-		undef,
-		$timeString,
-		$CurStatus,
-		$CurId);
-	# Should we send owner a note?
-	if (($CurStatus eq "Unreachable") && ($CurNotify ne ""))
-	{
-		my $CurBody = <<"END_MESSAGE_BODY";
-Dear $CurNotify,
- 
-At our last scan of your Argentum Age Server we could not connect to it. You may want to look into it or disable notifications if you don't want to get these messages in the future.
-
-Next check will be in roughly 6 hours.
- 
-Regards,
-The Admins at Argentum Age Server List @ ArgentumAge.GamePlayer.club
-END_MESSAGE_BODY
-		$email = Email::Simple->create(
-		header => [
-		       From => $EMAIL_FROM,
-		       To => $CurNotify,
-		       Subject => $EMAIL_SUBJ,
-		],
-		body => $CurBody);
-		sendmail($email);
-	}
-}
 
 # Checks the file type
 sub CheckFileType
@@ -137,22 +100,38 @@ sub CheckFileType
 	else
 	{
 		# Didn't see this file type
-#		print "Did not see file type\n";
+#		print "Did not see file type - setting to $UnknownType\n";
 		$FileType = $UnknownType;
 	}
 	# Check if the file type has changed
 	if ($CurFilePic ne "$FileType.png")
 	{
-		print "Types did not match\n";
-print "CurFilePic = '$CurFilePic'\n";
-print "FileType = '$FileType.png'\n";
+print "CurFileName = '$CurFileName'\n";
+print "\tCurFilePic = '$CurFilePic'\n";
+print "\tFileType = '$FileType.png'\n";
 		# Extensions differ, update file record
 		$CurFilePic = "$FileType.png";
+#next;
+		$dbh->do("UPDATE $DB_Table SET file_pic = ? WHERE id = ?",
+			undef,
+			$CurFilePic,
+			$CurId);
 	}
 }
 
 print("jddownloads file type updater ($VERSION)\n");
 print("===========================================\n");
+
+if (defined $CMDOPTION)
+{
+        if ($CMDOPTION ne "prefs")
+        {
+                print "Unknown command line option: '$CMDOPTION'\nOnly allowed option is 'prefs'\n";
+                exit 0;
+        }
+	system("$FILEEDITOR $CONF_FILE");
+	exit 0;
+}
 
 ### The database handle
 $dbh = DBI->connect ("DBI:mysql:database=$DB_Name:host=localhost",
