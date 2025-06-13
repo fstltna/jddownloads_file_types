@@ -31,7 +31,11 @@ my $IconDir="/var/www/html/images/jdownloads/fileimages/flat_1/";
 my $UnknownType = "unknown";
 my $FILEEDITOR = $ENV{EDITOR};
 
-if ($FILEEDITOR eq "")
+if (! defined($FILEEDITOR))
+{
+        $FILEEDITOR = "nano";
+}
+elsif ($FILEEDITOR eq "")
 {
         $FILEEDITOR = "nano";
 }
