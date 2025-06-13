@@ -3,17 +3,16 @@
 # This tool scans all the entries in the jddownloads database to set
 # icon to the type for that file
 
-#use strict;
+use strict;
 use warnings;
 use IO::Socket::PortState qw(check_ports);
 use DBI;
-use Email::Simple;
-use Email::Simple::Creator;
-use Email::Sender::Simple qw(sendmail);
 
 # No changes below here
-my $CurHost="";
-my $CurPort=0;
+my $CurTitle="";
+my $CurAlias=0;
+my $CurFilePic=0;
+my $CurFileName=0;
 my $CurId=0;
 my $CurStatus="";
 my $timeout=5;
@@ -30,7 +29,8 @@ my $EMAIL_FROM="";
 my $CurNotify="";
 my $CurName="";
 my $email="";
-my $fh = "";
+my $IconDir="/var/www/html/images/jdownloads/fileimages/flat_1/";
+my $UnknownType = "unknown.png";
 
 # Read in configuration options
 open(CONF, "<$CONF_FILE") || die("Unable to read config file '$CONF_FILE'");
@@ -117,21 +117,41 @@ END_MESSAGE_BODY
 	}
 }
 
-# Checks to see if the Argentum Age Server is up
-sub CheckArgentum
+# Checks the file type
+sub CheckFileType
 {
-	my %port_hash = (
-		tcp => {
-			$CurPort => {},
-		}
-	);
-
-	my $host_hr = check_ports($CurHost, $timeout, \%port_hash);
-	$CurStatus = $host_hr->{tcp}{$CurPort}{open} ? "Active" : "Unreachable";
-	my $HostTable = sprintf("%-25s : %-30s : %-5s : %s", $CurName, $CurHost, $CurPort, $CurStatus);
-	print "$HostTable\n";
-	print $fh "$CurName,$CurHost,$CurPort\n";
-	MarkArgentum();
+	my $DotPos = rindex($CurFileName, ".");
+	if ($DotPos == 0)
+	{
+		print "Did not see a dot in $CurFileName\n";
+		return;
+	}
+	my $FileType = substr($CurFileName, $DotPos + 1);
+#	print "File Type = $FileType\n";
+#	print "Saw $CurFileName\n";
+	if (-f "$IconDir/$FileType.png")
+	{
+		# Saw this file type
+#		print "Saw file type\n";
+	}
+	else
+	{
+		# Didn't see this file type
+#		print "Did not see file type\n";
+		$FileType = $UnknownType;
+	}
+	# Check if the file type has changed
+	if ($CurFilePic ne "$FileType.png")
+	{
+print "CurFilePic = '$CurFilePic'\n";
+print "FileType = '$FileType.png'\n";
+		print "Types did not match\n";
+		# Extensions differ, update file record
+		my $CurLen = length($FileType);
+		my $ZZZ = substr($CurFileName, 0, $DotPos);
+		$ZZZ = "$ZZZ.$FileType";
+		print "ZZZ = $ZZZ\n";
+	}
 }
 
 print("jddownloads file type updater ($VERSION)\n");
@@ -145,33 +165,24 @@ $dbh = DBI->connect ("DBI:mysql:database=$DB_Name:host=localhost",
 
 $DB_Table = $DB_Prefix . "jdownloads_files";
 
-exit 0;	# ZZZ
-
 ### The statement handle
-my $sth = $dbh->prepare("SELECT id, partner_url, field1, field2, field5, field6 FROM $DB_Table");
+my $sth = $dbh->prepare("SELECT id, title, alias, file_pic, url_download FROM $DB_Table");
 
 $sth->execute or die $dbh->errstr;
 
 my $rows_found = $sth->rows;
 
-# What file should we output the game list to?
-my $CSV_Output_File = "/var/www/html/GameServers-out.csv";
-my $CSV_Output_Destination_File = "/var/www/html/GameServers.csv";
-
-open($fh, '>', $CSV_Output_File) or die "Could not create file '$CSV_Output_File' $!";
-print $fh "servername,serverhost,serverport\n";
 while (my $row = $sth->fetchrow_hashref)
 {
 	$CurId = $row->{'id'};
-	$CurHost = $row->{'field1'};
-	$CurPort = $row->{'field2'};
-	$CurNotify = $row->{'field5'};
-	$CurName = $row->{'field6'};
-	if ($CurHost ne "")
+	$CurTitle = $row->{'title'};
+	$CurAlias = $row->{'alias'};
+	$CurFilePic = $row->{'file_pic'};
+	$CurFileName = $row->{'url_download'};
+	# print "Saw $CurTitle\n";
+	if ($CurFileName ne "")
 	{
-		CheckArgentum();
+		CheckFileType();
 	}
 }
-close($fh);
-system("mv $CSV_Output_File $CSV_Output_Destination_File");
 exit(0);
