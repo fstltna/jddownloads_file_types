@@ -30,7 +30,7 @@ my $CurNotify="";
 my $CurName="";
 my $email="";
 my $IconDir="/var/www/html/images/jdownloads/fileimages/flat_1/";
-my $UnknownType = "unknown.png";
+my $UnknownType = "unknown";
 
 # Read in configuration options
 open(CONF, "<$CONF_FILE") || die("Unable to read config file '$CONF_FILE'");
@@ -143,14 +143,11 @@ sub CheckFileType
 	# Check if the file type has changed
 	if ($CurFilePic ne "$FileType.png")
 	{
+		print "Types did not match\n";
 print "CurFilePic = '$CurFilePic'\n";
 print "FileType = '$FileType.png'\n";
-		print "Types did not match\n";
 		# Extensions differ, update file record
-		my $CurLen = length($FileType);
-		my $ZZZ = substr($CurFileName, 0, $DotPos);
-		$ZZZ = "$ZZZ.$FileType";
-		print "ZZZ = $ZZZ\n";
+		$CurFilePic = "$FileType.png";
 	}
 }
 
