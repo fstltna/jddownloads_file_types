@@ -1,8 +1,4 @@
 #!/bin/bash
-cpan -i IO::Socket::PortState
 cpan -i DBI
-cpan -i  Email::Simple
-cpan -i  Email::Simple::Creator
-cpan -i  Email::Sender::Simple 
-cpan -i  DBD::mysql
+cpan -i DBD::mysql
 exit 0
