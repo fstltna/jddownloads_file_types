@@ -1,5 +1,5 @@
 # jddownloads_file_types (1.0)
-Checks the file type icon for listings in the jddownloads file manager component
+Checks the file type icon for listings in the jdownloads file manager component
 
 ***
 
@@ -22,3 +22,6 @@ Checks the file type icon for listings in the jddownloads file manager component
 	./scan_file_types.pl prefs
 
 4. That should be enough, it should be workable now.
+
+Be sure and make a backup before running this tool!
+
