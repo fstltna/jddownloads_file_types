@@ -5,8 +5,9 @@
 
 use strict;
 use warnings;
-use IO::Socket::PortState qw(check_ports);
 use DBI;
+use DBD::mysql;
+
 
 # No changes below here
 my $CurTitle="";
@@ -16,7 +17,7 @@ my $CurFileName="";
 my $CurId=0;
 my $CurStatus="";
 my $timeout=5;
-my $VERSION="1.0";
+my $VERSION="1.1";
 my $DB_Owner="";
 my $DB_Pswd="";
 my $DB_Name="";
@@ -63,8 +64,18 @@ open(CONF, "<$CONF_FILE") || die("Unable to read config file '$CONF_FILE'");
 while(<CONF>)
 {
 	chop;
+	if ($_ eq "")
+	{
+		next;
+	}
 	my ($FIELD_TYPE, $FIELD_VALUE) = split (/	/, $_);
 	#print("Type is $FIELD_TYPE\n");
+	if (! defined($FIELD_TYPE))
+	{
+		# Field type not defined
+		print "Field type not defined for '$_'\n";
+		next;
+	}
 	if ($FIELD_TYPE eq "DB_User")
 	{
 		$DB_Owner = $FIELD_VALUE;
