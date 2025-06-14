@@ -13,12 +13,15 @@ Checks the file type icon for listings in the jdownloads file manager component
         The prefix is what appears at the start of every field in that list.
 
 2. Run this script to install the dependancies:
+
 	./installdeps
 
 3. Run this script and the first time it will ask you to configure the tool.
+
 	./scan_file_types.pl
 
 	If you need to change the settings run:
+
 	./scan_file_types.pl prefs
 
 4. That should be enough, it should be workable now.
