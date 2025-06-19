@@ -1,4 +1,4 @@
-# jddownloads_file_types (1.1.1)
+# jddownloads_file_types (1.2.0)
 Checks the file type icon for listings in the jdownloads file manager component
 
 ***

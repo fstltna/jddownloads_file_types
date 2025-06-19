@@ -17,7 +17,7 @@ my $CurFileName="";
 my $CurId=0;
 my $CurStatus="";
 my $timeout=5;
-my $VERSION="1.1";
+my $VERSION="1.2";
 my $DB_Owner="";
 my $DB_Pswd="";
 my $DB_Name="";
@@ -34,11 +34,11 @@ my $FILEEDITOR = $ENV{EDITOR};
 
 if (! defined($FILEEDITOR))
 {
-        $FILEEDITOR = "nano";
+        $FILEEDITOR = "vi";
 }
 elsif ($FILEEDITOR eq "")
 {
-        $FILEEDITOR = "nano";
+        $FILEEDITOR = "vi";
 }
 
 # Get if they said a option
