@@ -1,18 +1,13 @@
-# jddownloads_file_types (1.2.0)
+# jddownloads_file_types (1.2.1)
 Checks the file type icon for listings in the jdownloads file manager component
 
 ***
 
 1. If you don't know what your table prefix is you can use the following commands to see what it is. The prefix MUST end with a "_".
 
-        mysql -p
-        use joomla;
-        show tables;
-        quit;
+        grep dbprefix /var/www/html/configuration.php
 
-        The prefix is what appears at the start of every field in that list.
-
-2. Run this script to install the dependancies:
+2. Run this script to install the dependencies:
 
 	./installdeps
 
