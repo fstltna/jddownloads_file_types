@@ -17,7 +17,7 @@ my $CurFileName="";
 my $CurId=0;
 my $CurStatus="";
 my $timeout=5;
-my $VERSION="1.2";
+my $VERSION="1.2.2";
 my $DB_Owner="";
 my $DB_Pswd="";
 my $DB_Name="";
@@ -48,10 +48,10 @@ my $CMDOPTION = shift;
 if (! -f $CONF_FILE)
 {
 	my $DefaultConf = <<'END_MESSAGE';
-DB_User root
-DB_Pswd foobar
-DB_DBName       joomla
-DB_DBtblpfx     zzz_
+DB_User	root
+DB_Pswd	foobar
+DB_DBName	joomla
+DB_DBtblpfx	zzz_
 END_MESSAGE
 	open (my $FH, ">", $CONF_FILE) or die "Could not create config file '$CONF_FILE' $!";
         print $FH "$DefaultConf\n";
