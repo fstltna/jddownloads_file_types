@@ -1,4 +1,4 @@
-# jddownloads_file_types (1.2.2)
+# jddownloads_file_types (1.3.0)
 Checks the file type icon for listings in the jdownloads file manager component
 
 ***
@@ -20,6 +20,8 @@ Checks the file type icon for listings in the jdownloads file manager component
 	./scan_file_types.pl prefs
 
 4. That should be enough, it should be workable now.
+
+5. You can now run ./listmissing to list the file types icons you need
 
 Be sure and make a backup before running this tool!
 
