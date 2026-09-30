@@ -1,0 +1,44 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+
+my @files = glob "*";
+
+my $Version = "1.0.0";
+
+print "Downcase $Version\n";
+print "=================\n";
+
+foreach my $file (@files)
+{
+	my $length = length($file);
+        my $DotPos = rindex($file, ".");
+        if ($DotPos == -1)
+        {
+                # print "Did not see a dot in $file\n";
+                next;
+        }
+	# print "saw dot\n";
+        my $FileType = substr($file, $DotPos + 1);
+        if ($FileType eq "")
+        {
+                next;
+        }
+	#print "file = '$file'\n";
+	#print "type = $FileType\n";
+	my $ExtLen = length($FileType);
+	my $NewExt = lc($FileType);
+	my $Basename = substr($file, 0, length($file) - $ExtLen);
+	#print "basename '$Basename'\n";
+	if ($NewExt eq $FileType)
+	{
+		# Already lower case
+		next;
+	}
+	my $NewFile = $Basename . $NewExt;
+	#print "newfile = $NewFile\n";
+	print "renaming '$file' to '$NewFile'\n";
+	system ("mv $file $NewFile");
+}
+print "done...\n";
+exit 0;
