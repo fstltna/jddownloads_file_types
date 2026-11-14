@@ -17,7 +17,7 @@ my $CurFileName="";
 my $CurId=0;
 my $CurStatus="";
 my $timeout=5;
-my $VERSION="1.0.0";
+my $VERSION="1.0.1";
 my $DB_Owner="";
 my $DB_Pswd="";
 my $DB_Name="";
@@ -48,7 +48,7 @@ my $CMDOPTION = shift;
 if (! -f $CONF_FILE)
 {
 	my $DefaultConf = <<'END_MESSAGE';
-DB_User	root
+DB_User	joomla
 DB_Pswd	foobar
 DB_DBName	joomla
 DB_DBtblpfx	zzz_
