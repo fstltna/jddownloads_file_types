@@ -4,7 +4,7 @@ use warnings;
 
 my @files = glob "*";
 
-my $Version = "1.0.0";
+my $Version = "1.0.1";
 
 print "Downcase $Version\n";
 print "=================\n";
@@ -38,7 +38,8 @@ foreach my $file (@files)
 	my $NewFile = $Basename . $NewExt;
 	#print "newfile = $NewFile\n";
 	print "renaming '$file' to '$NewFile'\n";
-	system ("mv $file $NewFile");
+	system ("mv '$file' '$NewFile'");
 }
+close($fh);
 print "done...\n";
 exit 0;

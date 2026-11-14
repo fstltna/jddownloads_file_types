@@ -1,0 +1,109 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+
+my @files = glob "*";
+my $InputFile = "/tmp/files";
+my $FindCommand = "find -L . -print > $InputFile";
+my $DoRename = 0;
+my $Version = "1.0.0";
+
+print "Downcaseall $Version\n";
+print "====================\n";
+
+my $num_args = $#ARGV + 1;
+if ($num_args != 0)
+{
+        if ($ARGV[0] eq "rename")
+        {
+		$DoRename = 1;
+        }
+	else
+	{
+		print "unknown option. Only option is \"rename\"\n";
+		exit 0;
+	}
+}
+system($FindCommand);
+
+open(my $fh, '<', $InputFile)
+  or die "Could not open file '$InputFile' $!";
+
+while (my $file = <$fh>)
+{
+	if (! defined($file))
+	{
+		next;
+	}
+	chop($file);
+	if ($file eq "")
+	{
+		next;
+	}
+	if (($file eq ".") || ($file eq ".."))
+	{
+		# skip directory links
+		next;
+	}
+	$file = substr($file, 2);
+	if ($file eq "index.html")
+	{
+		next;
+	}
+	#print "saw $file\n";
+        if (rindex($file, ".git") > 0)
+	{
+		print "Skipping .git\n";
+		next;
+	}
+	if (-d $file)
+	{
+		#print "Skipping directory $file\n";
+		next;
+	}
+	my $length = length($file);
+        my $DotPos = rindex($file, ".");
+        if ($DotPos < 1)
+        {
+                # print "Did not see a dot in $file\n";
+                next;
+        }
+	if (($length - $DotPos) > 10)
+	{
+		#print "DotPos outside limit in $file\n";
+		next;
+	}
+	# print "saw dot\n";
+        my $FileType = substr($file, $DotPos + 1);
+        if ($FileType eq "")
+        {
+		#print "filetype was null\n";
+                next;
+        }
+	#print "file = '$file'\n";
+	#print "type = $FileType\n";
+	my $ExtLen = length($FileType);
+	my $NewExt = lc($FileType);
+	my $Basename = substr($file, 0, length($file) - $ExtLen);
+	#print "basename '$Basename'\n";
+	if ($NewExt eq $FileType)
+	{
+		#print "Already lowercase $file\n";
+		next;
+	}
+	my $NewFile = $Basename . $NewExt;
+	print "renaming '$file' to '$NewFile' - ";
+	if ($DoRename != 0)
+	{
+		system ("mv \"$file\" \"$NewFile\"");
+		print "Done\n";
+	}
+	else
+	{
+		print "skipped\n";
+	}
+}
+close($fh);
+
+print "done...\n";
+exit 0;
