@@ -17,7 +17,7 @@ my $CurFileName="";
 my $CurId=0;
 my $CurStatus="";
 my $timeout=5;
-my $VERSION="1.2.2";
+my $VERSION="1.2.3";
 my $DB_Owner="";
 my $DB_Pswd="";
 my $DB_Name="";
@@ -48,7 +48,7 @@ my $CMDOPTION = shift;
 if (! -f $CONF_FILE)
 {
 	my $DefaultConf = <<'END_MESSAGE';
-DB_User	root
+DB_User	joomla
 DB_Pswd	foobar
 DB_DBName	joomla
 DB_DBtblpfx	zzz_
@@ -105,9 +105,10 @@ sub CheckFileType
 		return;
 	}
 	my $FileType = substr($CurFileName, $DotPos + 1);
+	my $FileTypeLc = lc($FileType);
 #	print "File Type = $FileType\n";
 #	print "Saw $CurFileName\n";
-	if (-f "$IconDir/$FileType.png")
+	if (-f "$IconDir/$FileTypeLc.png")
 	{
 		# Saw this file type
 #		print "Saw file type\n";
@@ -119,13 +120,13 @@ sub CheckFileType
 		$FileType = $UnknownType;
 	}
 	# Check if the file type has changed
-	if ($CurFilePic ne "$FileType.png")
+	if (lc($CurFilePic) ne "$FileTypeLc.png")
 	{
 print "CurFileName = '$CurFileName'\n";
 print "\tCurFilePic = '$CurFilePic'\n";
-print "\tFileType = '$FileType.png'\n";
+print "\tFileType = '$FileTypeLc.png'\n";
 		# Extensions differ, update file record
-		$CurFilePic = "$FileType.png";
+		$CurFilePic = "$FileTypeLc.png";
 #next;
 		$dbh->do("UPDATE $DB_Table SET file_pic = ? WHERE id = ?",
 			undef,
